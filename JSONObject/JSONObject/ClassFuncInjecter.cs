@@ -99,5 +99,174 @@ namespace JSON
             return builder.ToString();
         }
         #endregion
+        #region FromString
+        internal static bool TryParseObjFromStr(string str, out Object result)
+        {
+            result = null;
+            if (null != str)
+            {
+                string tempStr = "";
+                if (TryParseStringFromStr(str,out tempStr))
+                {
+                    result = tempStr;
+                    return true;
+                }
+                Dictionary<string,Object> tempDic = new Dictionary<string, object>();
+                if (TryParseDictionaryFromStr(str, out tempDic))
+                {
+                    result = tempDic;
+                    return true;
+                }
+                List<Object> tempList = new List<object>();
+                if (TryParseListFromStr(str, out tempList))
+                {
+                    result = tempList;
+                    return true;
+                }
+                int tempInt = 0;
+                if (TryParseIntFromStr(str, out tempInt))
+                {
+                    result = tempInt;
+                    return true;
+                }
+                double tempDouble = 0;
+                if (TryParseDoubleFromStr(str, out tempDouble))
+                {
+                    result = tempDouble;
+                    return true;
+                }
+                bool tempBool = false;
+                if (TryParseBoolFromStr(str, out tempBool))
+                {
+                    result = tempBool;
+                    return true;
+                }
+                return false;
+            }
+            else
+                return false; 
+        }
+        internal static bool TryParseStringFromStr(string str, out String result)
+        {
+            result = null;
+            str = str.Trim();
+            if (str.IsStrStartEndByChar('\"', '\"') == true)
+            {
+                str = str.CutOffFirstAndLast();
+                result = str;
+                return true;
+            }
+            else
+                return false;
+        }
+        internal static bool TryParseDoubleFromStr(string str, out Double result)
+        {
+            result = 0;
+            str = str.Trim();
+            if (str.IndexOf('.') > 0)
+            {
+                return Double.TryParse(str, out result);           
+            } 
+            return false;
+        }
+        internal static bool TryParseBoolFromStr(string str, out Boolean result)
+        {
+            str = str.Trim();
+            return Boolean.TryParse(str, out result);
+        }
+        public static bool TryParsePairFromStr(string str, out string resultKey, out Object resultValue)
+        {
+            str = str.Trim();
+            resultKey = "";
+            resultValue = null;
+            string[] pairStr = str.Split(',');
+            if (pairStr.Length == 2)
+            {
+                if (TryParseStringFromStr(pairStr[0], out resultKey) && TryParseObjFromStr(pairStr[1], out resultValue))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        internal static bool TryParseIntFromStr(string str, out Int32 result)
+        {
+            str = str.Trim();
+            return Int32.TryParse(str, out result);
+        }
+        internal static bool TryParseListFromStr(string str, out List<Object> result)
+        {
+            result = new List<object>();
+            str = str.Trim();
+            if (str.IsStrStartEndByChar('[',']') == true)
+            {
+                str = str.CutOffFirstAndLast();
+                string[] objs = str.Split(',');
+                if (objs.Length > 0)
+                {
+                    foreach (string index in objs)
+                    {
+                        string indexStr = index.Trim();
+                        Object obj = new object();
+                        if (TryParseObjFromStr(indexStr, out obj))
+                        {
+                            result.Add(obj);
+                        }
+                    }
+                }
+
+                return true;
+            }
+            else
+                return false;
+        }
+        internal static bool TryParseDictionaryFromStr(string str, out Dictionary<string, Object> result)
+        {
+            result = new Dictionary<string, object>();
+            str = str.Trim();
+            if (str.IsStrStartEndByChar('{', '}') == true)
+            {
+                str = str.CutOffFirstAndLast();
+                string[] objs = str.Split(',');
+                if (objs.Length > 0)
+                {
+                    foreach (string index in objs)
+                    {
+                        string indexStr = index.Trim();
+                        string key = "";
+                        Object value = new object();
+                        if (TryParsePairFromStr(indexStr, out key, out value))
+                        {
+                            result.Add(key,value);
+                        }
+                    }
+                }
+                return true;
+            }
+            else
+                return false;
+        }
+        #endregion
+        #region Str Utils
+        public static bool? IsStrStartEndByChar(this string str, char chrStart,char chrEnd)
+        {
+            bool? result = null;
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                result = str.First().Equals(chrStart) && str.Last().Equals(chrEnd);
+            }
+            return result;
+        }
+        public static string CutOffFirstAndLast(this string str)
+        {
+            int length = str.Length;
+            if (length > 1)
+            {
+                return str.Substring(1, str.Length - 1 -1);
+            }
+            else
+                return str;
+        }
+        #endregion
     }
 }

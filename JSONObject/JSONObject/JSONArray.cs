@@ -23,5 +23,28 @@ namespace JSON
             builer.Append("]");
             return builer.ToString();
         }
+        public static JSONArray FromString(string str)
+        {
+            JSONArray result = new JSONArray();
+            str = str.Trim();
+            if (str.IsStrStartEndByChar('[', ']') == true)
+            {
+                str = str.CutOffFirstAndLast();
+                string[] objs = str.Split(',');
+                if (objs.Length > 0)
+                {
+                    foreach (string index in objs)
+                    {
+                        string indexStr = index.Trim();
+                        Object obj = new object();
+                        if (ClassFuncInjecter.TryParseObjFromStr(indexStr, out obj))
+                        {
+                            result.Add(obj);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
     }
 }

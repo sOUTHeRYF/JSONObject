@@ -31,6 +31,30 @@ namespace JSON
             return builder.ToString();
             
         }
+        public static JSONObject FromString(string str)
+        {
+            JSONObject result = new JSONObject();
+            str = str.Trim();
+            if (str.IsStrStartEndByChar('{', '}') == true)
+            {
+                str = str.CutOffFirstAndLast();
+                string[] objs = str.Split(',');
+                if (objs.Length > 0)
+                {
+                    foreach (string index in objs)
+                    {
+                        string indexStr = index.Trim();
+                        string key = "";
+                        Object value = new object();
+                        if (ClassFuncInjecter.TryParsePairFromStr(indexStr, out key, out value))
+                        {
+                            result.Add(key, value);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
 
     }
 }

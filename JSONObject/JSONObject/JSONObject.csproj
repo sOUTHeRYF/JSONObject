@@ -43,6 +43,8 @@
     <Compile Include="JSONArray.cs" />
     <Compile Include="JSONObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeriaObject.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
